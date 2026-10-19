@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#FFFFFF">
+<title>ফটোকার্ড মেকার | আমার বাংলা</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preload" href="fonts/baloo-da-2.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/hind-siliguri-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/bn-digits.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <img src="assets/logo-black.png" alt="আমার বাংলা" class="bar-logo" width="190" height="37">
+  <span class="bar-title">ফটোকার্ড মেকার</span>
+  <button type="button" class="bar-new" id="newCard">নতুন কার্ড</button>
+</header>
+
+<main class="layout">
+  <section class="preview" aria-label="প্রিভিউ">
+    <div class="stage" id="stage">
+      <canvas id="card" width="1080" height="1350" aria-label="ফটোকার্ডের প্রিভিউ"></canvas>
+      <div class="drop-hint" id="dropHint">ছবি এখানে ছেড়ে দিন</div>
+    </div>
+    <p class="hint">ছবির উপর টেনে সরান · ছবি টেনে এনে ছাড়ুন বা Ctrl+V দিয়ে পেস্ট করুন</p>
+    <div class="actions">
+      <button type="button" class="btn btn-main" id="dlPng">ছবি ডাউনলোড (PNG)</button>
+      <button type="button" class="btn" id="dlJpg">JPG</button>
+      <button type="button" class="btn" id="copyImg">কপি</button>
+    </div>
+    <p class="toast" id="toast" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="panel" aria-label="সেটিংস">
+    <div class="group">
+      <h2>ডিজাইন</h2>
+      <div class="layouts" id="layouts">
+        <button type="button" data-v="circle"><i class="ly ly-circle"></i>বৃত্ত</button>
+        <button type="button" data-v="full"><i class="ly ly-full"></i>পুরো ছবি</button>
+        <button type="button" data-v="frame"><i class="ly ly-frame"></i>ফ্রেম</button>
+        <button type="button" data-v="breaking"><i class="ly ly-breaking"></i>ব্রেকিং</button>
+        <button type="button" data-v="quote"><i class="ly ly-quote"></i>উক্তি</button>
+        <button type="button" data-v="split"><i class="ly ly-split"></i>দুই ছবি</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2>মাপ</h2>
+      <div class="seg" id="sizes">
+        <button type="button" data-v="45">ফিড ৪:৫</button>
+        <button type="button" data-v="11">বর্গ ১:১</button>
+        <button type="button" data-v="916">স্টোরি ৯:১৬</button>
+        <button type="button" data-v="169">চওড়া ১৬:৯</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2><label for="headline" id="headlineLabel">শিরোনাম</label></h2>
+      <textarea id="headline" rows="3" placeholder="যেমন: পদ্মায় ইলিশের *ভরা মৌসুম*, দাম কমার আশা"></textarea>
+      <p class="help">কোনো শব্দ লাল বাক্সে দেখাতে দুই পাশে তারকা দিন: *শব্দ*। নতুন লাইন দিতে Enter।</p>
+      <div class="quote-only">
+        <div class="two">
+          <div><label for="qName">বক্তার নাম</label><input type="text" id="qName" placeholder="যেমন: মো. রফিকুল ইসলাম"></div>
+          <div><label for="qRole">পরিচয়</label><input type="text" id="qRole" placeholder="যেমন: শিক্ষা উপদেষ্টা"></div>
+        </div>
+      </div>
+      <div class="not-quote">
+        <label for="sub" class="lbl">ছোট লাইন (ঐচ্ছিক)</label>
+        <input type="text" id="sub" placeholder="শিরোনামের নিচে এক লাইনের তথ্য">
+      </div>
+      <div class="two">
+        <div>
+          <label for="fs" class="lbl">লেখার আকার</label>
+          <input type="range" id="fs" min="0.8" max="1.25" step="0.01" value="1">
+        </div>
+        <div>
+          <span class="lbl">লেখা বসবে</span>
+          <div class="seg seg-sm" id="align">
+            <button type="button" data-v="center">মাঝে</button>
+            <button type="button" data-v="left">বাঁয়ে</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2><label for="category">বিভাগ</label></h2>
+      <div class="chips" id="chips"></div>
+      <input type="text" id="category" placeholder="অথবা নিজে লিখুন (খালি রাখলে দেখাবে না)">
+    </div>
+
+    <div class="group">
+      <h2>লোগো ও বিভাগের আকার</h2>
+      <div class="sliders">
+        <label for="logoScale">লোগো</label><input type="range" id="logoScale" min="0.5" max="1.4" step="0.01">
+        <label for="catScale">বিভাগ</label><input type="range" id="catScale" min="0.7" max="1.6" step="0.01">
+      </div>
+    </div>
+
+    <div class="group">
+      <h2><label for="date">তারিখ</label></h2>
+      <input type="date" id="date">
+      <label class="check"><input type="checkbox" id="showDate"> তারিখ দেখাও</label>
+      <label class="check"><input type="checkbox" id="bangabda"> বঙ্গাব্দ তারিখও দেখাও</label>
+    </div>
+
+    <div class="group">
+      <h2>ছবি</h2>
+      <label class="drop" id="drop1">
+        <input type="file" id="file1" accept="image/*">
+        <b id="drop1Text">ছবি বেছে নিন</b><span>JPG, PNG বা WebP</span>
+      </label>
+      <div class="split-only">
+        <label class="drop" id="drop2">
+          <input type="file" id="file2" accept="image/*">
+          <b id="drop2Text">দ্বিতীয় ছবি বেছে নিন</b><span>ডান পাশের ছবি</span>
+        </label>
+      </div>
+      <div class="sliders">
+        <label for="zoom">জুম</label><input type="range" id="zoom" min="1" max="3" step="0.01" value="1">
+        <label for="bright">উজ্জ্বলতা</label><input type="range" id="bright" min="60" max="140" step="1" value="100">
+        <label for="contrast">কনট্রাস্ট</label><input type="range" id="contrast" min="60" max="140" step="1" value="100">
+      </div>
+      <label class="check"><input type="checkbox" id="gray"> সাদাকালো ছবি</label>
+      <div class="row-btns">
+        <button type="button" class="btn btn-sm" id="resetPhoto">ছবি আগের অবস্থায়</button>
+        <button type="button" class="btn btn-sm" id="removePhoto">ছবি সরান</button>
+      </div>
+      <label for="credit" class="lbl">ছবির সূত্র (ঐচ্ছিক)</label>
+      <input type="text" id="credit" placeholder="যেমন: ছবি: সংগৃহীত">
+    </div>
+
+    <div class="group">
+      <h2>রং</h2>
+      <div class="themes" id="themes"></div>
+      <div class="colors">
+        <label>প্যানেল <input type="color" id="cPanel"></label>
+        <label>অ্যাকসেন্ট <input type="color" id="cAccent"></label>
+        <label>হাইলাইট <input type="color" id="cHigh"></label>
+      </div>
+      <span class="lbl">শিরোনামের লেখার রং</span>
+      <div class="textcolor">
+        <input type="color" id="cText" aria-label="শিরোনামের রং">
+        <button type="button" class="btn btn-sm" id="textAuto">অটো (পটভূমি দেখে)</button>
+      </div>
+      <span class="lbl">হাইলাইট করা শব্দ</span>
+      <div class="seg seg-sm" id="hlStyle">
+        <button type="button" data-v="box">রঙিন বাক্সে</button>
+        <button type="button" data-v="text">শুধু রঙে</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2>নিচের লেখা</h2>
+      <div class="two">
+        <div><label for="site" class="lbl">ওয়েবসাইট</label><input type="text" id="site"></div>
+        <div><label for="footer" class="lbl">ডান পাশে</label><input type="text" id="footer"></div>
+      </div>
+      <span class="lbl">ছবির উপরে লোগো</span>
+      <div class="seg seg-sm" id="logoPos">
+        <button type="button" data-v="left">বাঁয়ে</button>
+        <button type="button" data-v="right">ডানে</button>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
