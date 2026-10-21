@@ -45,7 +45,6 @@
   const BMONTHS = ["বৈশাখ", "জ্যৈষ্ঠ", "আষাঢ়", "শ্রাবণ", "ভাদ্র", "আশ্বিন", "কার্তিক", "অগ্রহায়ণ", "পৌষ", "মাঘ", "ফাল্গুন", "চৈত্র"];
   function parseISO(iso) { const [y, m, d] = (iso || todayISO()).split("-").map(Number); return new Date(y, m - 1, d); }
   function bangabda(dt) {
-    // বাংলাদেশের সংশোধিত বর্ষপঞ্জি: ১৪ এপ্রিল পহেলা বৈশাখ; প্রথম ৬ মাস ৩১ দিন, পরের ৫ মাস ৩০ (ফাল্গুন অধিবর্ষে ৩০, নইলে ২৯), চৈত্র ৩০
     const y = dt.getFullYear();
     let start = new Date(y, 3, 14), by = y - 593;
     if (dt < start) { start = new Date(y - 1, 3, 14); by = y - 594; }
@@ -157,6 +156,7 @@
     return { lines, sp };
   }
   const boxFg = (bg) => isLight(bg) ? "#16161A" : "#FFFFFF";
+
   // headline: *word* = red rounded box with white text (or coloured text if the box style is off)
   function text(str, box, o) {
     const weight = o.weight || 800, LH = o.lh || 1.28, align = o.align || state.align;
@@ -174,7 +174,7 @@
     res.lines.forEach((ln, i) => {
       let x = align === "center" ? box.x + (box.w - ln.w) / 2 : box.x + (useBox ? fs * 0.15 : 0);
       const y = top + i * lh + fs * 0.92;
-      // pass 1: boxes behind runs of highlighted words
+      // pass 1: boxes behind runs of highlighted words (সংশোধিত পজিশনিং ও হাইট)
       if (useBox) {
         let runStart = null, cx = x;
         ln.words.forEach((wd, wi) => {
@@ -183,7 +183,12 @@
             if (p.hl && runStart === null) runStart = px;
             const nextHl = pi2 < wd.pieces.length - 1 ? wd.pieces[pi2 + 1].hl : (wi < ln.words.length - 1 && ln.words[wi + 1].pieces[0].hl);
             px += p.w;
-            if (p.hl && !nextHl) { ctx.fillStyle = o.high; rr(runStart - fs * 0.14, y - fs * 0.86, px - runStart + fs * 0.28, fs * 1.12, fs * 0.2); ctx.fill(); runStart = null; }
+            if (p.hl && !nextHl) { 
+              ctx.fillStyle = o.high; 
+              rr(runStart - fs * 0.15, y - fs * 0.82, px - runStart + fs * 0.3, fs * 1.08, fs * 0.2); 
+              ctx.fill(); 
+              runStart = null; 
+            }
           });
           cx += wd.w + res.sp;
         });
@@ -199,6 +204,7 @@
     });
     return { top, blockH, fs, bottom: top + blockH };
   }
+
   function oneLine(str, x, y, maxW, size, color, align, weight) {
     if (!str) return;
     let fs = size; ctx.font = `${weight || "600"} ${fs}px ${BN2}`;
@@ -227,7 +233,6 @@
   const catChip = (x, y, h, right) => state.category.trim() && pill(state.category.trim(), x, y, h * (state.catScale || 1), state.accent, boxFg(state.accent), right);
 
   // ---------- layouts ----------
-  // বৃত্ত: photo on top, a big red half-disc rises from the seam carrying the date
   function circle(W, H) {
     ctx.fillStyle = state.panel; ctx.fillRect(0, 0, W, H);
     if (land()) {
@@ -247,7 +252,6 @@
     const topY = story() ? 230 : 44;
     logo(48, topY, 72, true, true, state.logoPos === "right", W);
     catChip(state.logoPos === "right" ? 48 : W - 48, topY + 6, 60, state.logoPos !== "right");
-    // half-disc at the seam
     const R = 150;
     dot(W / 2, ph + 20, R, state.accent);
     ctx.fillStyle = state.panel; ctx.fillRect(0, ph + 20, W, H);
@@ -265,7 +269,6 @@
     footer(W, H, dark());
   }
 
-  // পুরো ছবি: full photo, headline sits on a rounded panel that overlaps the photo
   function full(W, H) {
     ctx.fillStyle = state.panel; ctx.fillRect(0, 0, W, H);
     photo(1, 0, 0, W, H); topShade(0, W, story() ? 520 : 260);
@@ -273,7 +276,6 @@
     logo(48, topY, land() ? 56 : 72, true, true, state.logoPos === "right", W);
     if (state.showDate) pill(dateLabel(), state.logoPos === "right" ? 48 : W - 48, topY + 8, land() ? 46 : 54, "rgba(255,255,255,.92)", "#16161A", state.logoPos !== "right", `600 ${land() ? 22 : 25}px ${BN2}`);
     const m = land() ? 40 : 44, bottomGap = story() ? 250 : 44;
-    const toks = (state.headline || "").trim();
     const panelH = land() ? Math.round(H * 0.5) : Math.round(H * (story() ? 0.3 : 0.36));
     const py = H - bottomGap - panelH, pw = land() ? Math.round(W * 0.62) : W - m * 2;
     ctx.save(); ctx.shadowColor = "rgba(0,0,0,.3)"; ctx.shadowBlur = 40; ctx.shadowOffsetY = 10;
@@ -289,7 +291,6 @@
     credit(W - 18, py - 14);
   }
 
-  // ফ্রেম: soft background, rounded photo, small red disc badge with the category
   function frame(W, H) {
     const bg = dark() ? state.panel : (state.panel.toLowerCase() === "#ffffff" ? "#F2F3F5" : state.panel);
     ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
@@ -324,7 +325,6 @@
     if (state.footer.trim()) oneLine(state.footer.trim(), W - m, footY + 86, W / 2, 23, subCol(), "right");
   }
 
-  // ব্রেকিং: accent background, pulsing rings, rounded photo
   function breaking(W, H) {
     const A = state.accent === "#16161A" || isLight(state.accent) ? RED : state.accent;
     ctx.fillStyle = A; ctx.fillRect(0, 0, W, H);
@@ -332,7 +332,6 @@
     for (let r = 140; r < Math.max(W, H) * 1.2; r += 90) { ctx.beginPath(); ctx.arc(W - 40, 40, r, 0, Math.PI * 2); ctx.stroke(); }
     const topY = story() ? 220 : land() ? 30 : 48;
     logo(48, topY, land() ? 50 : 64, true, false);
-    // live badge
     const label = state.category.trim() || "ব্রেকিং নিউজ";
     const cs = state.catScale || 1;
     ctx.font = `800 ${Math.round((land() ? 30 : 36) * cs)}px ${BN}`;
@@ -361,7 +360,6 @@
     if (state.footer.trim()) oneLine(state.footer.trim(), W - 60, y2 + 2, W / 2 - 60, 27, "rgba(255,255,255,.9)", "right");
   }
 
-  // উক্তি: speaker in a circle with a red ring, quote centred below
   function quote(W, H) {
     ctx.fillStyle = state.panel; ctx.fillRect(0, 0, W, H);
     if (land()) {
@@ -390,7 +388,6 @@
     footer(W, H, dark());
   }
 
-  // দুই ছবি: two photos in circles side by side with a "বনাম" disc between
   function split(W, H) {
     ctx.fillStyle = state.panel; ctx.fillRect(0, 0, W, H);
     const topY = story() ? 220 : land() ? 30 : 48;
@@ -419,7 +416,6 @@
 
   const LAYOUTS = { circle, full, frame, breaking, quote, split };
 
-  // ---------- render ----------
   let raf = 0;
   function schedule() { cancelAnimationFrame(raf); raf = requestAnimationFrame(render); }
   function render() {
@@ -434,7 +430,6 @@
     $("headlineLabel").textContent = state.layout === "quote" ? "উক্তি" : "শিরোনাম";
   }
 
-  // ---------- photos ----------
   function loadPhoto(file, n) {
     if (!file || !file.type || !file.type.startsWith("image/")) { toast("এটা ছবি না। JPG, PNG বা WebP দিন।", true); return; }
     const url = URL.createObjectURL(file), im = new Image();
@@ -469,7 +464,6 @@
     if (item) { e.preventDefault(); loadPhoto(item.getAsFile(), state.layout === "split" && photos[1].img && !photos[2].img ? 2 : 1); toast("ছবি পেস্ট হয়েছে"); }
   });
 
-  // drag to reposition inside the frame; wheel to zoom
   let drag = null;
   function hit(e) {
     const r = cv.getBoundingClientRect(), k = cv.width / r.width, x = (e.clientX - r.left) * k, y = (e.clientY - r.top) * k;
@@ -503,7 +497,6 @@
     $("file1").value = ""; $("file2").value = ""; $("drop1Text").textContent = "ছবি বেছে নিন"; $("drop2Text").textContent = "দ্বিতীয় ছবি বেছে নিন"; schedule();
   });
 
-  // ---------- controls ----------
   function seg(id, key) {
     const el = $(id);
     const sync = () => el.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.v === String(state[key])));
@@ -553,7 +546,6 @@
     $("removePhoto").click(); save(); schedule(); $("headline").focus();
   });
 
-  // ---------- export ----------
   function fileName(ext) {
     const words = (state.headline || "card").replace(/\*/g, "").replace(/[\\/:*?"<>|\n]/g, " ").trim().split(/\s+/).slice(0, 5).join("-");
     return `amar-bangla-${state.date}-${words || "card"}.${ext}`;
@@ -582,7 +574,6 @@
   let toastT = 0;
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.style.color = err ? "#C8141B" : "#0a7a2f"; clearTimeout(toastT); toastT = setTimeout(() => (t.textContent = ""), 3500); }
 
-  // ---------- URL prefill: ?title=…&cat=…&sub=…&img=… ----------
   const q = new URLSearchParams(location.search);
   if (q.get("title")) { state.headline = q.get("title"); $("headline").value = state.headline; }
   if (q.get("sub")) { state.sub = q.get("sub"); $("sub").value = state.sub; }
