@@ -302,7 +302,7 @@
       logo(tx, m + 4, 44, dark(), false);
       catChip(tx, m + 80, 44, false);
       const b = text(state.headline, { x: tx, y: m + 140, w: tw, h: H - m * 2 - 220 }, { max: 54, min: 26, valign: "middle", align: "left", color: textCol(), high: state.high, placeholder: "শিরোনাম এখানে দেখাবে" });
-      if (state.sub.trim()) oneLine(state.sub.trim(), tx, b.bottom + 20, tw, 23, subCol());
+      if (state.sub.trim()) oneLine(state.sub.trim(), tx, b.bottom + 12, tw, 23, subCol());
       if (state.showDate) oneLine(dateLabel(), tx, H - m - 18, tw, 21, subCol());
       return;
     }
@@ -315,11 +315,11 @@
       dot(W - m - r + 10, top + phh, r, state.accent);
       ctx.fillStyle = boxFg(state.accent); ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(state.category.trim(), W - m - r + 10, top + phh + 2); ctx.textAlign = "left";
     }
-    let y = top + phh + 30; // spacing komanor jonno 56 theke 30 kora holo
-    if (state.showDate) { oneLine(dateLabel(), m, y, W - m * 2 - 160, 25, subCol()); y += 32; }
-    const footY = H - (story() ? 300 : 140), subH = state.sub.trim() ? 40 : 0;
+    let y = top + phh + 24; 
+    if (state.showDate) { oneLine(dateLabel(), m, y, W - m * 2 - 160, 25, subCol()); y += 30; }
+    const footY = H - (story() ? 300 : 140), subH = state.sub.trim() ? 35 : 0;
     const b = text(state.headline, { x: m, y, w: W - m * 2, h: footY - y - subH - 10 }, { max: 74, min: 34, valign: story() ? "middle" : "top", align: "left", color: textCol(), high: state.high, placeholder: "শিরোনাম এখানে দেখাবে" });
-    if (subH) oneLine(state.sub.trim(), m, b.bottom + 16, W - m * 2, 27, subCol()); // b.bottom + 28 er poriborte 16 kora holo jate pasapasi/soman thake
+    if (subH) oneLine(state.sub.trim(), m, b.bottom + 10, W - m * 2, 27, subCol()); // b.bottom + 10 দিয়ে দূরত্ব আরও কমিয়ে দেওয়া হয়েছে
     logo(m, footY + 34, 52, dark(), false);
     ctx.font = `700 24px ${EN}`; ctx.fillStyle = subCol(); ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.fillText(state.site.trim(), W - m, footY + 50); ctx.textAlign = "left";
     if (state.footer.trim()) oneLine(state.footer.trim(), W - m, footY + 86, W / 2, 23, subCol(), "right");
