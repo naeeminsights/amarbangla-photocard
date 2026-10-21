@@ -243,8 +243,8 @@
       const tx = pw + 150, tw = W - tx - 56;
       catChip(tx, 60, 50, false);
       const b = text(state.headline, { x: tx, y: 130, w: tw, h: H - 260 }, { max: 58, min: 28, valign: "middle", align: "left", color: textCol(), high: state.high, placeholder: "শিরোনাম এখানে দেখাবে" });
-      if (state.sub.trim()) oneLine(state.sub.trim(), tx, b.bottom + 1, tw, 15, subCol());
-      if (state.showDate) oneLine(dateLabel(), tx, H - 64, tw, 22, subCol());
+      if (state.sub.trim()) oneLine(state.sub.trim(), tx, b.bottom + 32, tw, 24, subCol());
+      if (state.showDate) oneLine(dateLabel(), tx, H - 20, tw, 22, subCol());
       return;
     }
     const ph = Math.round(H * (story() ? 0.5 : state.size === "11" ? 0.55 : 0.57));
