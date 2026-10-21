@@ -316,10 +316,17 @@
       ctx.fillStyle = boxFg(state.accent); ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(state.category.trim(), W - m - r + 10, top + phh + 2); ctx.textAlign = "left";
     }
     let y = top + phh + 24; 
-    if (state.showDate) { oneLine(dateLabel(), m, y, W - m * 2 - 160, 25, subCol()); y += 30; }
-    const footY = H - (story() ? 300 : 140), subH = state.sub.trim() ? 35 : 0;
-    const b = text(state.headline, { x: m, y, w: W - m * 2, h: footY - y - subH - 10 }, { max: 74, min: 34, valign: story() ? "middle" : "top", align: "left", color: textCol(), high: state.high, placeholder: "শিরোনাম এখানে দেখাবে" });
-    if (subH) oneLine(state.sub.trim(), m, b.bottom + 10, W - m * 2, 27, subCol()); // b.bottom + 10 দিয়ে দূরত্ব আরও কমিয়ে দেওয়া হয়েছে
+    if (state.showDate) { oneLine(dateLabel(), m, y, W - m * 2 - 160, 25, subCol()); y += 32; }
+    
+    const footY = H - (story() ? 300 : 140);
+    // শিরোনামের জন্য নির্দিষ্ট জায়গা নির্ধারণ করে রেন্ডার করা হলো
+    const b = text(state.headline, { x: m, y, w: W - m * 2, h: footY - y - 80 }, { max: 74, min: 34, valign: "top", align: "left", color: textCol(), high: state.high, placeholder: "শিরোনাম এখানে দেখাবে" });
+    
+    // সাবটাইটেল বা ছোট লাইনটি সরাসরি শিরোনামের শেষ লাইনের (b.bottom) ঠিক নিচে বসানো হলো
+    if (state.sub.trim()) {
+      oneLine(state.sub.trim(), m, b.bottom + 12, W - m * 2, 27, subCol());
+    }
+
     logo(m, footY + 34, 52, dark(), false);
     ctx.font = `700 24px ${EN}`; ctx.fillStyle = subCol(); ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.fillText(state.site.trim(), W - m, footY + 50); ctx.textAlign = "left";
     if (state.footer.trim()) oneLine(state.footer.trim(), W - m, footY + 86, W / 2, 23, subCol(), "right");
